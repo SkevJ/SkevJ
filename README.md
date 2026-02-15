@@ -1,4 +1,4 @@
-# Hi there, I'm SkevJ | Full Stack Developer 👋
+# Hi there, I'm Kevi 👋
 
 <p align="center">
   <img src="https://view-counter.api.fnkr.net/v1/counter/SkevJ" alt="Views">
