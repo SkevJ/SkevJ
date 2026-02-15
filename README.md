@@ -63,7 +63,7 @@
 
 <div align="center">
   <h2>📊 Top Languages</h2>
-  <img src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=SkevJ&layout=compact&theme=tokyonight&hide_border=true" alt="Most Used Languages" />
+  <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/tokyonight/2-most-commit-language.svg" alt="Most Used Languages" />
 </div>
 
 ---
