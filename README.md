@@ -31,9 +31,14 @@
     </td>
     <td valign="top" width="50%">
       <div align="center">
-        <img src="https://github-readme-stats-eight-theta.vercel.app/api?username=SkevJ&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" alt="SkevJ's GitHub stats" />
+        <!-- Profile Details Card (Replaces basic stats) -->
+        <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/midnight_purple/0-profile-details.svg" alt="Profile Details" />
         <br/><br/>
-        <img src="https://streak-stats.demolab.com/?user=SkevJ&theme=tokyonight&hide_border=true" alt="GitHub Streak" />
+        <!-- Streak Stats (Keeping for consistency, updated theme if supported or kept tokyonight for now) -->
+        <img src="https://streak-stats.demolab.com/?user=SkevJ&theme=midnight-purple&hide_border=true" alt="GitHub Streak" />
+        <br/><br/>
+        <!-- Productive Time Card -->
+        <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/midnight_purple/4-productive-time.svg" alt="Productive Time" />
       </div>
     </td>
   </tr>
@@ -63,7 +68,8 @@
 
 <div align="center">
   <h2>📊 Top Languages</h2>
-  <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/tokyonight/2-most-commit-language.svg" alt="Most Used Languages" />
+  <!-- Updated to use midnight_purple theme from local generated files -->
+  <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/midnight_purple/2-most-commit-language.svg" alt="Most Used Languages" />
 </div>
 
 ---
