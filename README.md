@@ -18,13 +18,13 @@
       <ul>
         <li>🔭 Working on bespoke software solutions & IT consultancy in Honduras.</li>
         <li>👯 Collaborating on Full Stack enterprise apps (.NET/React).</li>
-        <li>🤝 Open to help with payment gateway integrations & cloud architecture.</li>
+        <li>🤝 Open to learning with payment gateway integrations & cloud architecture.</li>
         <li>🌱 Learning advanced TypeScript patterns, Tailwind optimization & video production.</li>
-        <li>⚡ <b>Fun fact:</b> I switch from debugging SQL stored procs to editing high-quality video in minutes.</li>
+        <li>⚡ <b>Fun fact:</b> I love playing piano.</li>
       </ul>
       <br />
       <div align="left">
-        <a href="https://linkedin.com/in/tu-usuario">
+        <a href="https://www.linkedin.com/in/kevin-sanchez-5b41a8151">
           <img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin" alt="LinkedIn" />
         </a>
       </div>
