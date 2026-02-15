@@ -1,9 +1,9 @@
 <div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=24&pause=1000&color=F7F7F7&center=true&vCenter=true&width=435&lines=Hi+there!+%F0%9F%91%8B+I'm+Kevi;Full+Stack+Developer;Net+Core+%26+React+Specialist;Building+Scalable+Solutions" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=F7F7F7&center=true&vCenter=true&width=435&lines=Hi+there!+%F0%9F%91%8B+I'm+Kevi;Full+Stack+Developer;Net+Core+%26+React+Specialist;Building+Scalable+Solutions" alt="Typing SVG" />
 </div>
 
 <div align="center">
-  <img src="https://view-counter.api.fnkr.net/v1/counter/SkevJ" alt="Views">
+  <img src="https://komarev.com/ghpvc/?username=SkevJ&style=flat-square&color=blue" alt="Views">
 </div>
 
 ---
@@ -31,9 +31,9 @@
     </td>
     <td valign="top" width="50%">
       <div align="center">
-        <img src="https://github-readme-stats.vercel.app/api?username=SkevJ&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" alt="SkevJ's GitHub stats" />
+        <img src="https://github-readme-stats-eight-theta.vercel.app/api?username=SkevJ&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" alt="SkevJ's GitHub stats" />
         <br/><br/>
-        <img src="https://github-readme-streak-stats.herokuapp.com/?user=SkevJ&theme=tokyonight&hide_border=true" alt="GitHub Streak" />
+        <img src="https://streak-stats.demolab.com/?user=SkevJ&theme=tokyonight&hide_border=true" alt="GitHub Streak" />
       </div>
     </td>
   </tr>
@@ -63,7 +63,7 @@
 
 <div align="center">
   <h2>📊 Top Languages</h2>
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=SkevJ&layout=compact&theme=tokyonight&hide_border=true" alt="Most Used Languages" />
+  <img src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=SkevJ&layout=compact&theme=tokyonight&hide_border=true" alt="Most Used Languages" />
 </div>
 
 ---
