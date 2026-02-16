@@ -17,7 +17,7 @@
       </p>
       <ul>
         <li>🔭 Working on bespoke software solutions & IT consultancy in Honduras.</li>
-        <li>👯 Collaborating on Full Stack enterprise apps (.NET/React).</li>
+        <li>👯 Collaborating on Stack apps (.NET/React).</li>
         <li>🤝 Open to learning with payment gateway integrations & cloud architecture.</li>
         <li>🌱 Learning advanced TypeScript patterns, Tailwind optimization & video production.</li>
         <li>⚡ <b>Fun fact:</b> I love playing piano.</li>
