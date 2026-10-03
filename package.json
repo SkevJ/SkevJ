@@ -1,0 +1,11 @@
+{
+  "name": "skevj-profile",
+  "private": true,
+  "description": "Builds the cards on github.com/SkevJ. No dependencies.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node generator/build.mjs --out dist",
+    "preview": "node generator/build.mjs --out dist --preview",
+    "test": "node --test \"generator/test/*.test.mjs\""
+  }
+}

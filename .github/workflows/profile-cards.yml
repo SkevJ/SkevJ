@@ -1,0 +1,84 @@
+name: Profile cards
+
+on:
+  schedule:
+    - cron: "17 6 * * *" # 00:17 in Honduras (UTC-6), right after the day closes
+  push:
+    branches: [main]
+    paths:
+      - "generator/**"
+      - ".github/workflows/profile-cards.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-cards
+  cancel-in-progress: false
+
+jobs:
+  cards:
+    name: Build and publish the cards
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Test the generator
+        run: node --test "generator/test/*.test.mjs"
+
+      - name: Load yesterday's data
+        run: |
+          if git fetch --quiet --depth=1 origin output; then
+            git show FETCH_HEAD:data.json > "$RUNNER_TEMP/cache.json" || true
+          else
+            echo "No output branch yet; starting from the seed."
+          fi
+
+      - name: Build the cards
+        id: build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node generator/build.mjs --out "$RUNNER_TEMP/cards" --cache "$RUNNER_TEMP/cache.json"
+
+      # The cards live on their own branch, replaced on every run, so `main` keeps
+      # a clean history and a failed build never takes yesterday's cards offline.
+      - name: Publish to the output branch
+        working-directory: ${{ runner.temp }}/cards
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git init --quiet --initial-branch=output
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit --quiet --message "Profile cards for $(date -u +%Y-%m-%d)"
+          git push --quiet --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" output
+
+      # GitHub pauses scheduled workflows after 60 days without commits to a public
+      # repository. That is what silently stopped the old cards, so if `main` has been
+      # quiet for 50 days, leave an empty commit to keep the daily run alive.
+      - name: Keep the schedule alive
+        if: github.event_name == 'schedule'
+        run: |
+          last=$(git log -1 --format=%ct)
+          if [ $(( $(date +%s) - last )) -gt $(( 50 * 86400 )) ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit --quiet --allow-empty --message "Keep the daily card refresh alive"
+            git push --quiet origin HEAD:main
+          fi
+
+      - name: Flag stale data
+        if: steps.build.outputs.degraded == 'true'
+        run: |
+          echo "::error::The cards were published, but part of the data could not be refreshed. Read the warnings in 'Build the cards' (usually the GH_TOKEN secret has expired)."
+          exit 1

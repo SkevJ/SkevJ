@@ -1,71 +1,19 @@
-<div align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=F7F7F7&center=true&vCenter=true&width=435&lines=Hi+there!+%F0%9F%91%8B+I'm+Kevi;Full+Stack+Developer;Net+Core+%26+React+Specialist;Building+Scalable+Solutions" alt="Typing SVG" />
-</div>
+<p align="center">
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/hero-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/hero-light.svg" width="824" alt="Kevin Sánchez — full-stack developer in San Pedro Sula, Honduras. Hola, I’m Kevin. I build enterprise software end to end: React and TypeScript on the front, C# and SQL Server underneath, and serial cables down to the machines on the plant floor. Most of it lives in private repositories."></picture><br>
+<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/section-work-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/section-work-light.svg" width="824" alt="Work. Private projects, so the code stays private. This is the kind of work they are."></picture><br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-1-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-1-light.svg" width="412" alt="Talks to machines: web apps that read PLCs over DF1 serial and pull data from truck scales and biometric time clocks."></picture><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-2-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-2-light.svg" width="412" alt="Real time: SignalR and Web Push, so approvals, tickets and alerts reach people the moment they happen."></picture><br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-3-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-3-light.svg" width="412" alt="Data people use: financial statements built from ERP ledgers, sales forecasts, and Excel and PDF reports that write themselves."></picture><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-4-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/work-4-light.svg" width="412" alt="Tested before it ships: unit tests on both ends run before every deploy. A red test means it doesn’t ship."></picture><br>
+<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/section-numbers-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/section-numbers-light.svg" width="824" alt="Numbers. Read from GitHub every night. Private work counts too."></picture><br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-output-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-output-light.svg" width="412" alt="Output: contributions in the last 12 months and a day-by-day calendar. Updated daily."></picture><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-rhythm-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-rhythm-light.svg" width="412" alt="Rhythm: commits by hour of the day on a 24-hour dial, with the busiest hour and day. Updated daily."></picture><br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-streak-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-streak-light.svg" width="412" alt="Streak: days in a row, and every run of consecutive days since 2024. Updated daily."></picture><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-languages-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/plate-languages-light.svg" width="412" alt="Languages: share of code by size across my repositories. Updated daily."></picture><br>
+<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/section-tools-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/section-tools-light.svg" width="824" alt="Tools. What I reach for, from the browser down to the serial port."></picture><br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-1-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-1-light.svg" width="412" alt="Front end: React, TypeScript, Vite, Tailwind CSS, shadcn/ui, TanStack Query, React Hook Form, Zod, Framer Motion, Three.js, Recharts, Leaflet, Workbox."></picture><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-2-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-2-light.svg" width="412" alt="Back end and data: C#, ASP.NET Core, SQL Server, T-SQL, SignalR, Dapper, EF Core, JWT, FluentValidation, Serilog, QuestPDF, ClosedXML, xUnit."></picture><br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-3-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-3-light.svg" width="412" alt="Plant floor and ops: IIS, Cloudflare, Windows Server, PowerShell, GitHub Actions, Node.js, Python, VB.NET, WinForms, Allen-Bradley DF1, RS-232, ZKTeco."></picture><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-4-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/tools-4-light.svg" width="412" alt="Lately: learning advanced TypeScript patterns, 3D on the web, and video production. Off the clock: playing piano."></picture><br>
+<br>
+<a href="https://www.linkedin.com/in/kevin-sanchez-5b41a8151"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SkevJ/SkevJ/output/contact-dark.svg"><img src="https://raw.githubusercontent.com/SkevJ/SkevJ/output/contact-light.svg" width="824" alt="Let’s talk. Open to collaborations and consulting — .NET, React and SQL Server. Find me on LinkedIn."></picture></a>
+</p>
 
-<div align="center">
-  <img src="https://komarev.com/ghpvc/?username=SkevJ&style=flat-square&color=blue" alt="Views">
-</div>
-
----
-
-<table>
-  <tr>
-    <td valign="top" width="50%">
-      <h2>🚀 About Me</h2>
-      <p>
-        Software developer focused on building robust, scalable enterprise solutions. I specialize in the <b>React</b> and <b>.NET</b> ecosystems, delivering custom software and technical consultancy.
-      </p>
-      <ul>
-        <li>🔭 Working on bespoke software solutions & IT consultancy in Honduras.</li>
-        <li>👯 Collaborating on Stack apps (.NET/React).</li>
-        <li>🤝 Open to learning with payment gateway integrations & cloud architecture.</li>
-        <li>🌱 Learning advanced TypeScript patterns, Tailwind optimization & video production.</li>
-        <li>⚡ <b>Fun fact:</b> I love playing piano.</li>
-      </ul>
-      <br />
-      <div align="left">
-        <a href="https://www.linkedin.com/in/kevin-sanchez-5b41a8151">
-          <img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin" alt="LinkedIn" />
-        </a>
-      </div>
-    </td>
-    <td valign="top" width="50%">
-      <div align="center">
-        <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/midnight_purple/0-profile-details.svg" alt="Profile Details" />
-        <br/><br/>
-        <img src="https://streak-stats.demolab.com/?user=SkevJ&theme=midnight-purple&hide_border=true" alt="GitHub Streak" />
-        <br/><br/>
-        <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/midnight_purple/4-productive-time.svg" alt="Productive Time" />
-      </div>
-    </td>
-  </tr>
-</table>
-
----
-
-<div align="center">
-  <h2>🛠️ Tech Stack</h2>
-  
-  <h3>Backend & Database</h3>
-  <img src="https://img.shields.io/badge/C%23-%23239120.svg?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#">
-  <img src="https://img.shields.io/badge/.NET-%23512BD4.svg?style=for-the-badge&logo=dotnet&logoColor=white" alt="DOTNET">
-  <img src="https://img.shields.io/badge/Microsoft%20SQL%20Server-%23CC2927.svg?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server">
-  
-  <br/>
-
-  <h3>Frontend</h3>
-  <img src="https://img.shields.io/badge/React-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB" alt="React">
-  <img src="https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/JavaScript-%23F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind">
-
-</div>
-
-<br/>
-
-<div align="center">
-  <h2>📊 Top Languages</h2>
-  <img src="https://raw.githubusercontent.com/SkevJ/SkevJ/main/profile-summary-card-output/midnight_purple/2-most-commit-language.svg" alt="Most Used Languages" />
-</div>
-
----
+<p align="center"><sub>Every card above is drawn by a small, dependency-free Node.js script in <a href="https://github.com/SkevJ/SkevJ/tree/main/generator"><code>/generator</code></a> and refreshed daily by GitHub Actions.</sub></p>
