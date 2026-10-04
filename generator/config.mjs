@@ -4,7 +4,7 @@
 
 export const config = {
   login: 'SkevJ',
-  name: { first: 'Kevin', last: 'Sánchez' },
+  name: { first: 'Kevin', last: 'Sanchez' },
   role: 'Full-stack developer',
   place: 'San Pedro Sula · Honduras',
   timezone: { label: 'UTC−6', offsetMinutes: -360 },
