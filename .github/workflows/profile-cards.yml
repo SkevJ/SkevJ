@@ -8,10 +8,13 @@ on:
     paths:
       - "generator/**"
       - ".github/workflows/profile-cards.yml"
+      - "README.md"
   workflow_dispatch:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: profile-cards
@@ -47,11 +50,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: node generator/build.mjs --out "$RUNNER_TEMP/cards" --cache "$RUNNER_TEMP/cache.json"
+        run: node generator/build.mjs --out "$RUNNER_TEMP/cards" --cache "$RUNNER_TEMP/cache.json" --preview
 
-      # The cards live on their own branch, replaced on every run, so `main` keeps
-      # a clean history and a failed build never takes yesterday's cards offline.
-      - name: Publish to the output branch
+      # Publish to both `output` (for README SVG images) and `gh-pages` (for the interactive website)
+      - name: Publish to output and gh-pages branches
         working-directory: ${{ runner.temp }}/cards
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -62,10 +64,27 @@ jobs:
           git add --all
           git commit --quiet --message "Profile cards for $(date -u +%Y-%m-%d)"
           git push --quiet --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" output
+          git branch -M gh-pages
+          git push --quiet --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+
+      # Deploy directly to GitHub Pages via official action
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        continue-on-error: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/cards
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
 
       # GitHub pauses scheduled workflows after 60 days without commits to a public
-      # repository. That is what silently stopped the old cards, so if `main` has been
-      # quiet for 50 days, leave an empty commit to keep the daily run alive.
+      # repository. Keep schedule alive if quiet for 50 days.
       - name: Keep the schedule alive
         if: github.event_name == 'schedule'
         run: |
