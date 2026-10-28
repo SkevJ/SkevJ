@@ -28,7 +28,6 @@ const MOTION = `
 .lineup{animation:lineup 1000ms ${EASE_OUT} backwards}
 .odo{animation:odo 1600ms ${EASE_OUT} backwards}
 .stop{animation:stop 480ms ${EASE_OUT} backwards}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 `;
 
 export class Doc {

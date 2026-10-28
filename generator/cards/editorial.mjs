@@ -50,28 +50,36 @@ export function langForKeyword(word) {
 
 function addKeywordCss(doc, t) {
   doc.css(
-    `.kw{cursor:pointer;transition:fill 150ms ease-out,filter 150ms ease-out}` +
-    `.kw:hover,.kw.is-linked{fill:${t.accent}!important;filter:drop-shadow(0 0 8px ${t.accent}cc)}` +
+    `@keyframes kwScan{0%,76%,100%{fill-opacity:1;filter:none}84%,92%{fill:${t.accent};filter:drop-shadow(0 0 7px ${t.accent}d9)}}` +
+    `@keyframes stopBreath{0%,100%{filter:drop-shadow(0 0 2px ${t.accent}44)}50%{filter:drop-shadow(0 0 12px ${t.accent}cc)}}` +
+    `.kw{cursor:pointer;transition:fill 150ms ease-out,filter 150ms ease-out;animation:kwScan 9s ease-in-out infinite}` +
+    `.kw:hover,.kw.is-linked{fill:${t.accent}!important;filter:drop-shadow(0 0 8px ${t.accent}cc)!important}` +
     `.kw-giant,.stop{cursor:pointer;transition:fill 180ms ease-out,filter 180ms ease-out}` +
+    `.stop{animation:stop 480ms cubic-bezier(0.23,1,0.32,1) backwards,stopBreath 3.6s ease-in-out 1.2s infinite}` +
     `.kw-giant:hover,.stop:hover{filter:drop-shadow(0 0 12px ${t.accent}99)}` +
-    `@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.82)}}` +
-    `.live-dot{animation:pulseDot 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}` +
-    `.piano-key{cursor:pointer;transition:transform 90ms ease-out,filter 120ms ease}` +
-    `.piano-key:hover,.piano-key.is-active{transform:translateY(1.8px);filter:drop-shadow(0 0 8px ${t.accent}e6)}` +
+    `@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);filter:drop-shadow(0 0 6px ${t.accent})}50%{opacity:.35;transform:scale(.78);filter:none}}` +
+    `.live-dot{animation:pulseDot 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}` +
+    `@keyframes keyAuto{0%,82%,100%{transform:translateY(0);filter:none}88%,94%{transform:translateY(2px);filter:drop-shadow(0 0 8px ${t.accent}e6)}}` +
+    `@keyframes keyTopAuto{0%,82%,100%{}88%,94%{fill:${t.accent}}}` +
+    `.piano-key{cursor:pointer;transition:transform 90ms ease-out,filter 120ms ease;animation:keyAuto 6.4s ease-in-out infinite}` +
+    `.piano-key .pk-top{animation:keyTopAuto 6.4s ease-in-out infinite;animation-delay:inherit}` +
+    `.piano-key:hover,.piano-key.is-active{transform:translateY(1.8px)!important;filter:drop-shadow(0 0 8px ${t.accent}e6)!important}` +
     `.piano-key:hover .pk-top,.piano-key.is-active .pk-top{fill:${t.accent}!important}`
   );
 }
 
 // Splits a string into runs where every matched phrase gets its own style instance + `kw` class
-// so FontKit.wrap keeps each keyword in its own hoverable <tspan class="... kw">.
-export function highlightRuns(text, keywords, baseStyle, baseFill, kwFill = baseFill) {
+// and a staggered animation-delay so keywords light up in a travelling wave even inside GitHub <img>.
+export function highlightRuns(text, keywords, baseStyle, baseFill, kwFill = baseFill, startDelay = 1200) {
   if (!keywords?.length) return [{ text, style: baseStyle, fill: baseFill }];
   const escaped = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   const re = new RegExp(`(${escaped.join('|')})`, 'g');
   const parts = text.split(re).filter((p) => p.length > 0);
+  let kwIndex = 0;
   return parts.map((part) => {
     if (keywords.includes(part)) {
-      return { text: part.replace(/ /g, ' '), style: { ...baseStyle }, fill: kwFill, cls: 'kw' };
+      const delay = startDelay + (kwIndex++ * 950);
+      return { text: part.replace(/ /g, ' '), style: { ...baseStyle }, fill: kwFill, cls: 'kw', delay };
     }
     return { text: part, style: baseStyle, fill: baseFill };
   });
@@ -92,14 +100,14 @@ export async function hero({ theme: t, fonts, config }) {
   const placeW = doc.measure(placeText, type.label);
   doc.add(`<circle class="live-dot" cx="${r2(W - 8 - placeW - 10)}" cy="29" r="3.2" fill="${t.accent}"/>`);
   doc.add(
-    doc.text({ text: config.role, style: { ...type.label }, fill: t.ink, cls: 'kw' }, { x: 8, y: 33, cls: 'fade', delay: 150 }) +
-    doc.text({ text: placeText, style: { ...type.label }, fill: t.ink2, cls: 'kw' }, { x: W - 8, y: 33, anchor: 'end', cls: 'fade', delay: 210, extra: ' data-hero-clock="1"' })
+    doc.text({ text: config.role, style: { ...type.label }, fill: t.ink, cls: 'kw', delay: 800 }, { x: 8, y: 33, cls: 'fade', delay: 150 }) +
+    doc.text({ text: placeText, style: { ...type.label }, fill: t.ink2, cls: 'kw', delay: 2200 }, { x: W - 8, y: 33, anchor: 'end', cls: 'fade', delay: 210, extra: ' data-hero-clock="1"' })
   );
   doc.add(reveal(doc, { text: first, style: giant, fill: t.ink, cls: 'kw-giant' }, { x: 6, y: y1, delay: 120 }));
   doc.add(stopped(doc, last, giant, { x: 6, y: y2, delay: 210, stopDelay: 820 }));
   doc.add(rule(doc, { y: yRule, weight: 1, delay: 420 }));
-  doc.add(doc.text({ text: config.hero.greeting, style: { ...type.deck }, fill: t.ink, cls: 'kw' }, { x: 8, y: yText + 2, cls: 'rise', delay: 860 }));
-  const runs = highlightRuns(config.hero.intro, config.hero.keywords, type.body, t.ink, t.ink);
+  doc.add(doc.text({ text: config.hero.greeting, style: { ...type.deck }, fill: t.ink, cls: 'kw', delay: 1000 }, { x: 8, y: yText + 2, cls: 'rise', delay: 860 }));
+  const runs = highlightRuns(config.hero.intro, config.hero.keywords, type.body, t.ink, t.ink, 1400);
   const intro = doc.paragraph(runs, { x: 330, y: yText, width: 486, cls: 'rise', delay: 900 });
   doc.add(intro.svg);
   doc.height = yText + intro.height + 22;
@@ -121,7 +129,7 @@ export async function section({ theme: t, fonts, section: sec, size = type.secti
   const big = { ...type.section, size };
   const yWord = 33 + 16 + size * 0.74;
   doc.add(rule(doc, { y: 14 }));
-  doc.add(doc.text({ text: sec.num, style: { ...type.monoNum }, fill: t.accentInk, cls: 'kw' }, { x: 8, y: 33, cls: 'fade', delay: 150 }));
+  doc.add(doc.text({ text: sec.num, style: { ...type.monoNum }, fill: t.accentInk, cls: 'kw', delay: 900 }, { x: 8, y: 33, cls: 'fade', delay: 150 }));
   doc.add(labels(doc, { y: 33, right: sec.meta }));
   doc.add(stopped(doc, sec.word.toUpperCase(), big, { x: 6, y: yWord, delay: 120, stopDelay: 640 }));
   // The dek hangs from the cap height of the word.
@@ -147,16 +155,16 @@ export async function work({ theme: t, fonts, item, index, height }) {
   const L = workLayout(item, fonts);
   const d = (index % 2) * 80;
   doc.add(rule(doc, { y: PAD_TOP, weight: 1, delay: d }));
-  doc.add(doc.text({ text: String(index + 1).padStart(2, '0'), style: { ...type.numeral }, fill: t.accent, cls: 'kw' }, { x: 6, y: L.yNum, cls: 'rise', delay: 120 + d }));
-  doc.add(doc.text({ text: item.title, style: { ...type.heading }, fill: t.ink, cls: 'kw' }, { x: 8, y: L.yTitle, cls: 'rise', delay: 180 + d }));
-  const bodyRuns = highlightRuns(item.body, item.keywords, type.body, t.ink2, t.ink);
+  doc.add(doc.text({ text: String(index + 1).padStart(2, '0'), style: { ...type.numeral }, fill: t.accent, cls: 'kw', delay: 900 + index * 400 }, { x: 6, y: L.yNum, cls: 'rise', delay: 120 + d }));
+  doc.add(doc.text({ text: item.title, style: { ...type.heading }, fill: t.ink, cls: 'kw', delay: 1300 + index * 400 }, { x: 8, y: L.yTitle, cls: 'rise', delay: 180 + d }));
+  const bodyRuns = highlightRuns(item.body, item.keywords, type.body, t.ink2, t.ink, 1800 + index * 500);
   doc.add(doc.paragraph(bodyRuns, { x: 8, y: L.yBody, width: 392, cls: 'rise', delay: 240 + d }).svg);
 
   const tagList = Array.isArray(item.tags) ? item.tags : String(item.tags).split(/\s*·\s*/);
   const tagRuns = [];
   tagList.forEach((tag, i) => {
     if (i) tagRuns.push({ text: ' · ', style: type.monoU, fill: t.ink3 });
-    tagRuns.push({ text: tag, style: { ...type.monoU }, fill: t.ink3, cls: 'kw' });
+    tagRuns.push({ text: tag, style: { ...type.monoU }, fill: t.ink3, cls: 'kw', delay: 2600 + index * 400 + i * 750 });
   });
   doc.add(doc.text(tagRuns, { x: 8, y: height - 12, cls: 'fade', delay: 420 + d }));
   return doc;
@@ -177,7 +185,7 @@ export async function tools({ theme: t, fonts, group, index, height }) {
   const d = (index % 2) * 80;
   doc.add(rule(doc, { y: PAD_TOP, weight: 1, delay: d }));
   doc.add(labels(doc, { y: PAD_TOP + 19, left: group.title, right: group.meta, delay: 120 + d }));
-  // Primary tools in ink, the rest in the second ink: each item gets its own hover glow.
+  // Primary tools in ink, the rest in the second ink: each item gets its own hover & ambient scan glow.
   const runs = [];
   group.items.forEach((item, i) => {
     if (i) runs.push({ text: '  ·  ', style: type.body, fill: t.ink3 });
@@ -186,6 +194,7 @@ export async function tools({ theme: t, fonts, group, index, height }) {
       style: { ...type.body },
       fill: i < (group.primary || 0) ? t.ink : t.ink2,
       cls: 'kw',
+      delay: 1100 + index * 300 + i * 620,
     });
   });
   doc.add(doc.paragraph(runs, { x: 8, y: PAD_TOP + 52, width: 392, cls: 'rise', delay: 180 + d }).svg);
@@ -204,24 +213,25 @@ function latelyLayout(group, fonts) {
   return { rows, height: y - 30 + 30 };
 }
 
-// 3D isometric 1-octave mini-piano (C4–B4) tucked beside "Playing piano."
+// 3D isometric 1-octave mini-piano (C4–C5) tucked beside "Playing piano." with self-playing arpeggio loop!
 function renderMiniPiano(doc, t, x0, y0) {
+  // Arpeggio delays so keys play C4 -> E4 -> G4 -> B4 -> C5 -> B4 -> G4 -> E4 automatically on GitHub
   const whiteNotes = [
-    { note: 'C4', freq: 261.63, key: 'a' },
-    { note: 'D4', freq: 293.66, key: 's' },
-    { note: 'E4', freq: 329.63, key: 'd' },
-    { note: 'F4', freq: 349.23, key: 'f' },
-    { note: 'G4', freq: 392.00, key: 'g' },
-    { note: 'A4', freq: 440.00, key: 'h' },
-    { note: 'B4', freq: 493.88, key: 'j' },
-    { note: 'C5', freq: 523.25, key: 'k' },
+    { note: 'C4', freq: 261.63, key: 'a', delay: 1200 },
+    { note: 'D4', freq: 293.66, key: 's', delay: 5200 },
+    { note: 'E4', freq: 329.63, key: 'd', delay: 1900 },
+    { note: 'F4', freq: 349.23, key: 'f', delay: 4500 },
+    { note: 'G4', freq: 392.00, key: 'g', delay: 2600 },
+    { note: 'A4', freq: 440.00, key: 'h', delay: 5800 },
+    { note: 'B4', freq: 493.88, key: 'j', delay: 3300 },
+    { note: 'C5', freq: 523.25, key: 'k', delay: 4000 },
   ];
   const blackNotes = [
-    { pos: 0, note: 'C#4', freq: 277.18, key: 'w' },
-    { pos: 1, note: 'D#4', freq: 311.13, key: 'e' },
-    { pos: 3, note: 'F#4', freq: 369.99, key: 't' },
-    { pos: 4, note: 'G#4', freq: 415.30, key: 'y' },
-    { pos: 5, note: 'A#4', freq: 466.16, key: 'u' },
+    { pos: 0, note: 'C#4', freq: 277.18, key: 'w', delay: 6100 },
+    { pos: 1, note: 'D#4', freq: 311.13, key: 'e', delay: 6500 },
+    { pos: 3, note: 'F#4', freq: 369.99, key: 't', delay: 2950 },
+    { pos: 4, note: 'G#4', freq: 415.30, key: 'y', delay: 6900 },
+    { pos: 5, note: 'A#4', freq: 466.16, key: 'u', delay: 7300 },
   ];
   const kw = 18, kh = 34, gap = 2, step = kw + gap, depth = 3.5;
   const parts = [];
@@ -234,7 +244,7 @@ function renderMiniPiano(doc, t, x0, y0) {
     const x = x0 + i * step;
     const front = `<rect x="${x}" y="${y0 + kh}" width="${kw}" height="${depth}" rx="0.8" fill="${t.greys[2]}"/>`;
     const top = `<rect class="pk-top" x="${x}" y="${y0}" width="${kw}" height="${kh}" rx="1" fill="${t.greys[4]}" stroke="${t.hair}" stroke-width="0.8"/>`;
-    parts.push(`<g class="piano-key" data-note="${wn.note}" data-freq="${wn.freq}" data-key="${wn.key}">${front}${top}</g>`);
+    parts.push(`<g class="piano-key" style="animation-delay:${wn.delay}ms" data-note="${wn.note}" data-freq="${wn.freq}" data-key="${wn.key}">${front}${top}</g>`);
   });
 
   // Black sharp keys with 3D raised prism
@@ -243,11 +253,11 @@ function renderMiniPiano(doc, t, x0, y0) {
     const x = r2(x0 + (bn.pos + 1) * step - gap / 2 - bw / 2);
     const front = `<rect x="${x}" y="${y0 + bh - 1}" width="${bw}" height="3" rx="0.6" fill="${t.accentInk}"/>`;
     const top = `<rect class="pk-top" x="${x}" y="${y0 - 1.5}" width="${bw}" height="${bh}" rx="1" fill="${t.ink}"/>`;
-    parts.push(`<g class="piano-key" data-note="${bn.note}" data-freq="${bn.freq}" data-key="${bn.key}">${front}${top}</g>`);
+    parts.push(`<g class="piano-key" style="animation-delay:${bn.delay}ms" data-note="${bn.note}" data-freq="${bn.freq}" data-key="${bn.key}">${front}${top}</g>`);
   });
 
   doc.add(`<g class="fade" style="animation-delay:460ms">${parts.join('')}</g>`);
-  doc.add(doc.text({ text: 'KEYS A–K', style: { ...type.monoU, size: 9.5 }, fill: t.ink3, cls: 'kw' }, { x: x0 + whiteNotes.length * step - gap, y: y0 - 7, anchor: 'end', cls: 'fade', delay: 520 }));
+  doc.add(doc.text({ text: 'KEYS A–K', style: { ...type.monoU, size: 9.5 }, fill: t.ink3, cls: 'kw', delay: 2400 }, { x: x0 + whiteNotes.length * step - gap, y: y0 - 7, anchor: 'end', cls: 'fade', delay: 520 }));
 }
 
 export async function lately({ theme: t, fonts, group, height }) {
@@ -257,8 +267,8 @@ export async function lately({ theme: t, fonts, group, height }) {
   doc.add(rule(doc, { y: PAD_TOP, weight: 1, delay: 80 }));
   doc.add(labels(doc, { y: PAD_TOP + 19, left: group.title, right: group.meta, delay: 200 }));
   L.rows.forEach((r, i) => {
-    const runs = highlightRuns(r.text, r.keywords, type.body, t.ink, t.ink);
-    doc.add(doc.text({ text: r.label, style: { ...type.label }, fill: t.accentInk, cls: 'kw' }, { x: 8, y: r.yLabel, cls: 'fade', delay: 260 + i * 80 }));
+    const runs = highlightRuns(r.text, r.keywords, type.body, t.ink, t.ink, 1500 + i * 1100);
+    doc.add(doc.text({ text: r.label, style: { ...type.label }, fill: t.accentInk, cls: 'kw', delay: 1100 + i * 900 }, { x: 8, y: r.yLabel, cls: 'fade', delay: 260 + i * 80 }));
     doc.add(doc.paragraph(runs, { x: 8, y: r.yText, width: 392, cls: 'rise', delay: 300 + i * 80 }).svg);
     if (/piano/i.test(r.text)) {
       renderMiniPiano(doc, t, 244, r.yLabel - 4);
@@ -279,9 +289,9 @@ export async function contact({ theme: t, fonts, config }) {
   doc.add(stopped(doc, c.word.toUpperCase(), big, { x: 6, y: yWord, delay: 120, stopDelay: 640 }));
   const yRule = yWord + 26;
   doc.add(rule(doc, { y: yRule, weight: 1, delay: 300 }));
-  const bodyRuns = highlightRuns(c.body, c.keywords || ['collaborations', 'consulting', '.NET', 'React', 'SQL Server'], type.caption, t.ink2, t.ink);
+  const bodyRuns = highlightRuns(c.body, c.keywords || ['collaborations', 'consulting', '.NET', 'React', 'SQL Server'], type.caption, t.ink2, t.ink, 1400);
   doc.add(doc.text(bodyRuns, { x: 8, y: yRule + 30, cls: 'rise', delay: 500 }));
-  doc.add(doc.text({ text: `${c.link}  →`, style: { ...type.label }, fill: t.accentInk, cls: 'kw' }, { x: W - 8, y: yRule + 30, anchor: 'end', cls: 'rise', delay: 560 }));
+  doc.add(doc.text({ text: `${c.link}  →`, style: { ...type.label }, fill: t.accentInk, cls: 'kw', delay: 3200 }, { x: W - 8, y: yRule + 30, anchor: 'end', cls: 'rise', delay: 560 }));
   doc.height = yRule + 48;
   return doc;
 }
