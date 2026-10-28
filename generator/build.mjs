@@ -171,7 +171,10 @@ async function main() {
     path.join(out, 'README.md'),
     `# Generated cards\n\nThis branch is rebuilt from scratch every day by the Profile cards workflow; anything edited here is overwritten.\nThe source lives in [\`generator/\` on main](https://github.com/${config.login}/${config.login}/tree/main/generator).\n`,
   );
-  if (args.preview) await writePreview(out, rendered);
+  // Always write index.html (for GitHub Pages / live interactive edition) and preview.html when requested
+  const html = buildInteractiveHtml(rendered);
+  await writeFile(path.join(out, 'index.html'), html);
+  if (args.preview) await writeFile(path.join(out, 'preview.html'), html);
 
   notes.push(...fonts.warnings);
   const summary = [
@@ -184,11 +187,16 @@ async function main() {
   if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, `degraded=${notes.length ? 'true' : 'false'}\n`);
 }
 
-// Interactive preview with inline SVGs, hover glow, live readouts, and tactile Web Audio.
-async function writePreview(out, rendered) {
+// Interactive edition with inline SVGs, hover glow, cross-card language linking, mini-piano, live clock, and tactile Web Audio.
+function buildInteractiveHtml(rendered) {
   function renderColumn(theme) {
-    const c = (name, w) =>
-      `<div class="static-card" data-card="${name}" style="width:${w}px">${rendered[theme][name]}</div>`;
+    const c = (name, w) => {
+      const inner = rendered[theme][name];
+      if (name === 'contact') {
+        return `<a class="static-card" data-card="${name}" href="${config.linkedin}" target="_blank" rel="noopener" style="width:${w}px;text-decoration:none">${inner}</a>`;
+      }
+      return `<div class="static-card" data-card="${name}" style="width:${w}px">${inner}</div>`;
+    };
     return `
       <div class="card-row">${c('hero', 824)}</div><br>
       <div class="card-row">
@@ -210,11 +218,12 @@ async function writePreview(out, rendered) {
     `;
   }
 
-  const html = `<!doctype html>
+  return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>SkevJ — Profile Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${config.name.first} ${config.name.last} (${config.login}) — Interactive Profile</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -230,17 +239,28 @@ async function writePreview(out, rendered) {
     background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(14px);
     border-bottom: 1px solid rgba(243, 241, 236, 0.12);
     padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    flex-wrap: wrap;
   }
   body[data-mode="light"] .topbar { background: rgba(255, 255, 255, 0.92); border-bottom-color: #d1d9e0; color: #1f2328; }
-  .topbar-title { font-size: 13px; color: #a3a09a; }
+  .topbar-title { font-size: 13px; color: #a3a09a; display: flex; align-items: center; gap: 10px; }
   body[data-mode="light"] .topbar-title { color: #57606a; }
   .topbar-title strong { color: inherit; }
-  .pills { display: flex; gap: 6px; }
+  .kbd-hint {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 107, 61, 0.14);
+    color: #ff6b3d;
+    border: 1px solid rgba(255, 107, 61, 0.3);
+  }
+  .pills { display: flex; gap: 6px; align-items: center; }
   .pill {
     background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(150,150,150,0.25);
     padding: 6px 14px; border-radius: 999px; font-size: 12px;
     font-family: ui-monospace, SFMono-Regular, monospace; cursor: pointer;
     transition: transform 140ms ease-out, background 140ms ease;
+    text-decoration: none;
   }
   .pill:active { transform: scale(0.97); }
   .pill.active { background: #ff6b3d; color: #fff; border-color: #ff6b3d; box-shadow: 0 0 18px rgba(255,107,61,0.38); }
@@ -253,17 +273,23 @@ async function writePreview(out, rendered) {
   .col-dark { background: #0d1117; border-color: #30363d; }
   .col-light { background: #ffffff; border-color: #d1d9e0; display: none; }
   .card-row { display: flex; flex-wrap: wrap; width: 824px; margin: 0 auto; }
-  .static-card { position: relative; }
+  .static-card { position: relative; display: block; }
   .static-card svg { display: block; overflow: visible; }
   .cal-cell.is-neighbor { transform: translateY(-1.8px) scale(1.08); filter: drop-shadow(0 0 5px rgba(255, 107, 61, 0.4)); }
   .lang-seg.is-dimmed, .lang-row.is-dimmed { opacity: 0.35; }
   .lang-row.is-hovered tspan { fill: #ff6b3d !important; }
+  .kw.is-linked {
+    fill: #ff6b3d !important;
+    filter: drop-shadow(0 0 9px rgba(255, 107, 61, 0.9)) drop-shadow(0 0 16px rgba(255, 107, 61, 0.5)) !important;
+  }
 </style>
 </head>
 <body data-mode="dark">
   <div class="topbar">
     <div class="topbar-title">
-      <strong>SkevJ · Interactive Profile Preview</strong> — Hover keywords, tools, tags, and 3D data plates
+      <strong>${config.name.first} ${config.name.last} · Interactive Profile</strong>
+      <span>Hover keywords, tools &amp; 3D plates</span>
+      <span class="kbd-hint">🎹 Piano: Keys A–K / W–U</span>
     </div>
     <div class="pills">
       <button id="audio-toggle" class="pill audio-pill" onclick="toggleAudio(event)">
@@ -273,6 +299,7 @@ async function writePreview(out, rendered) {
       <button class="pill active" onclick="setMode('dark', this)">Dark (#0d1117)</button>
       <button class="pill" onclick="setMode('light', this)">Light (#ffffff)</button>
       <button class="pill" onclick="setMode('both', this)">Side by Side</button>
+      <a class="pill" href="https://github.com/${config.login}" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
   </div>
   <div class="stage-wrap">
@@ -280,6 +307,9 @@ async function writePreview(out, rendered) {
     <div id="col-light" class="col-box col-light">${renderColumn('light')}</div>
   </div>
   <script>
+    // =========================================================================
+    // 1. TACTILE WEB AUDIO SYNTHESIZER + ELECTRIC PIANO (Rhodes-style)
+    // =========================================================================
     const SoundFX = (() => {
       let ctx = null, enabled = true, lastTime = 0, noiseBuf = null;
       const PENTA = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51, 1567.98];
@@ -324,7 +354,7 @@ async function writePreview(out, rendered) {
       }
 
       function playKeyword(word = '') {
-        const ac = canPlay(30);
+        const ac = canPlay(28);
         if (!ac) return;
         let hash = 0;
         for (let i = 0; i < word.length; i++) hash = (hash * 31 + word.charCodeAt(i)) | 0;
@@ -414,10 +444,39 @@ async function writePreview(out, rendered) {
         osc.connect(g); g.connect(ac.destination); osc.start(t); osc.stop(t + 0.07);
       }
 
+      // Warm Electric Piano (Rhodes tine + warm fundamental body) for the "Playing piano." Easter egg
+      function playPianoNote(freq = 440) {
+        const ac = canPlay(10);
+        if (!ac) return;
+        const t = ac.currentTime, f = Number(freq) || 440;
+        // 1. Warm fundamental + detuned chorus twin
+        [f, f * 1.003, f * 2].forEach((hz, i) => {
+          const osc = ac.createOscillator(), g = ac.createGain();
+          osc.type = i === 2 ? 'triangle' : 'sine';
+          osc.frequency.setValueAtTime(hz, t);
+          const peak = i === 0 ? 0.095 : i === 1 ? 0.045 : 0.022;
+          const dur = i === 2 ? 0.28 : 0.65;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(peak, t + 0.005);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          osc.connect(g); g.connect(ac.destination);
+          osc.start(t); osc.stop(t + dur + 0.02);
+        });
+        // 2. Rhodes bell tine overtone (7x harmonic, short decay)
+        const tine = ac.createOscillator(), tg = ac.createGain();
+        tine.type = 'sine';
+        tine.frequency.setValueAtTime(f * 4, t);
+        tg.gain.setValueAtTime(0.0001, t);
+        tg.gain.linearRampToValueAtTime(0.018, t + 0.002);
+        tg.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+        tine.connect(tg); tg.connect(ac.destination);
+        tine.start(t); tine.stop(t + 0.1);
+      }
+
       ['pointerdown', 'keydown', 'click'].forEach(evt => window.addEventListener(evt, () => { if (enabled) ensureCtx(); }, { passive: true }));
       window.addEventListener('pointermove', () => { if (enabled && (!ctx || ctx.state === 'suspended')) ensureCtx(); }, { once: true, passive: true });
 
-      return { toggle() { enabled = !enabled; if (enabled) { ensureCtx(); playGiant(); } else updatePillUI(); }, playKeyword, playGiant, playCalendarCell, playDialTick, playStreak, playLanguage };
+      return { toggle() { enabled = !enabled; if (enabled) { ensureCtx(); playGiant(); } else updatePillUI(); }, playKeyword, playGiant, playCalendarCell, playDialTick, playStreak, playLanguage, playPianoNote };
     })();
 
     function toggleAudio(e) { e.stopPropagation(); SoundFX.toggle(); }
@@ -430,9 +489,113 @@ async function writePreview(out, rendered) {
       SoundFX.playGiant();
     }
 
-    document.querySelectorAll('.kw').forEach(el => el.addEventListener('pointerenter', () => SoundFX.playKeyword(el.textContent || '')));
-    document.querySelectorAll('.kw-giant, .stop').forEach(el => el.addEventListener('pointerenter', () => SoundFX.playGiant()));
+    // =========================================================================
+    // 2. LIVE HONDURAS CLOCK (UTC-6) IN HERO HEADER
+    // =========================================================================
+    function updateHondurasClock() {
+      const now = new Date();
+      // UTC-6 (America/Tegucigalpa)
+      const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+      const hn = new Date(utcMs - 6 * 3600000);
+      const hh = String(hn.getHours()).padStart(2, '0');
+      const mm = String(hn.getMinutes()).padStart(2, '0');
+      const ss = String(hn.getSeconds()).padStart(2, '0');
+      document.querySelectorAll('[data-hero-clock] tspan').forEach(el => {
+        el.textContent = 'SAN PEDRO SULA · HONDURAS · ' + hh + ':' + mm + ':' + ss + ' UTC−6';
+      });
+    }
+    updateHondurasClock();
+    setInterval(updateHondurasClock, 1000);
 
+    // =========================================================================
+    // 3. CROSS-CARD LANGUAGE LINKING (Keywords <-> Plate 04 Languages)
+    // =========================================================================
+    const KW_TO_LANG = {
+      'c#': 'C#', '.net': 'C#', 'asp.net core': 'C#', 'signalr': 'C#', 'dapper': 'C#',
+      'ef core': 'C#', 'fluentvalidation': 'C#', 'serilog': 'C#', 'automated documents': 'C#',
+      'xunit': 'C#', 'industrial serial': 'C#',
+      'react': 'TypeScript', 'typescript': 'TypeScript', 'advanced typescript patterns': 'TypeScript',
+      'vite': 'TypeScript', 'tanstack query': 'TypeScript', 'react hook form': 'TypeScript',
+      'zod': 'TypeScript', 'framer motion': 'TypeScript', 'three.js': 'TypeScript',
+      '3d on the web': 'TypeScript', 'recharts': 'TypeScript', 'leaflet': 'TypeScript', 'workbox': 'TypeScript',
+      'tailwind css': 'CSS', 'shadcn/ui': 'CSS',
+      'sql server': 'T-SQL', 't-sql': 'T-SQL', 'erp ledgers': 'T-SQL',
+      'python': 'Python', 'node.js': 'JavaScript',
+    };
+
+    function normText(s) {
+      return (s || '').replace(/\\u00a0/g, ' ').trim().toLowerCase();
+    }
+
+    function highlightLanguageAcrossProfile(langName) {
+      const target = (langName || '').toLowerCase();
+      // Highlight matching segments/rows in Plate 04
+      document.querySelectorAll('[data-card="plate-languages"]').forEach(card => {
+        const segs = [...card.querySelectorAll('.lang-seg')];
+        const rows = [...card.querySelectorAll('.lang-row')];
+        const matchIdx = segs.findIndex(s => (s.dataset.lang || '').toLowerCase() === target);
+        segs.forEach((s, i) => {
+          s.classList.toggle('is-hovered', matchIdx !== -1 && i === matchIdx);
+          s.classList.toggle('is-dimmed', matchIdx !== -1 && i !== matchIdx);
+        });
+        rows.forEach((r, i) => {
+          r.classList.toggle('is-hovered', matchIdx !== -1 && i === matchIdx);
+          r.classList.toggle('is-dimmed', matchIdx !== -1 && i !== matchIdx);
+        });
+      });
+      // Highlight all matching .kw elements across the entire profile
+      document.querySelectorAll('.kw').forEach(el => {
+        const mapped = KW_TO_LANG[normText(el.textContent)];
+        el.classList.toggle('is-linked', Boolean(target && mapped && mapped.toLowerCase() === target));
+      });
+    }
+
+    document.querySelectorAll('.kw').forEach(el => {
+      el.addEventListener('pointerenter', () => {
+        const txt = el.textContent || '';
+        SoundFX.playKeyword(txt);
+        const mapped = KW_TO_LANG[normText(txt)];
+        if (mapped) highlightLanguageAcrossProfile(mapped);
+      });
+      el.addEventListener('pointerleave', () => {
+        const mapped = KW_TO_LANG[normText(el.textContent)];
+        if (mapped) highlightLanguageAcrossProfile(null);
+      });
+    });
+
+    document.querySelectorAll('.kw-giant, .stop').forEach(el => {
+      el.addEventListener('pointerenter', () => SoundFX.playGiant());
+    });
+
+    // =========================================================================
+    // 4. INTERACTIVE MINI-PIANO IN LATELY (Mouse Hover, Click & Keyboard A-K)
+    // =========================================================================
+    document.querySelectorAll('.piano-key').forEach(keyEl => {
+      const trigger = () => {
+        SoundFX.playPianoNote(keyEl.dataset.freq);
+        keyEl.classList.add('is-active');
+        setTimeout(() => keyEl.classList.remove('is-active'), 180);
+      };
+      keyEl.addEventListener('pointerenter', trigger);
+      keyEl.addEventListener('pointerdown', trigger);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      const k = e.key.toLowerCase();
+      const matching = [...document.querySelectorAll('.piano-key[data-key="' + k + '"]')];
+      if (matching.length) {
+        SoundFX.playPianoNote(matching[0].dataset.freq);
+        matching.forEach(el => {
+          el.classList.add('is-active');
+          setTimeout(() => el.classList.remove('is-active'), 200);
+        });
+      }
+    });
+
+    // =========================================================================
+    // 5. INTERACTIVE 3D PLATES (Output, Rhythm, Streak, Languages)
+    // =========================================================================
     document.querySelectorAll('[data-card="plate-output"]').forEach(card => {
       const cells = [...card.querySelectorAll('.cal-cell')];
       const numEl = card.querySelector('[data-output-num] tspan');
@@ -518,7 +681,12 @@ async function writePreview(out, rendered) {
       const segs = [...card.querySelectorAll('.lang-seg')];
       const rows = [...card.querySelectorAll('.lang-row')];
       const highlight = (idx) => {
-        if (idx !== null) SoundFX.playLanguage(idx);
+        if (idx !== null) {
+          SoundFX.playLanguage(idx);
+          highlightLanguageAcrossProfile(segs[idx]?.dataset.lang || null);
+        } else {
+          highlightLanguageAcrossProfile(null);
+        }
         segs.forEach((s, i) => {
           s.classList.toggle('is-hovered', i === idx);
           s.classList.toggle('is-dimmed', idx !== null && i !== idx);
@@ -535,7 +703,6 @@ async function writePreview(out, rendered) {
   </script>
 </body>
 </html>`;
-  await writeFile(path.join(out, 'preview.html'), html);
 }
 
 main().catch((e) => {
