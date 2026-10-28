@@ -223,89 +223,245 @@ function buildInteractiveHtml(rendered) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${config.name.first} ${config.name.last} (${config.login}) — Interactive Profile</title>
+<title>${config.name.first} ${config.name.last} (${config.login}) — Interactive Workstation</title>
 <style>
   * { box-sizing: border-box; }
-  body {
+  html, body {
     margin: 0;
+    padding: 0;
     background: #0d1117;
     color: #f3f1ec;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    transition: background 200ms ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
   }
-  body[data-mode="light"] { background: #f6f8fa; color: #1f2328; }
-  .topbar {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(243, 241, 236, 0.12);
-    padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    flex-wrap: wrap;
+  .workstation {
+    width: 824px;
+    margin: 40px auto 100px auto;
   }
-  body[data-mode="light"] .topbar { background: rgba(255, 255, 255, 0.92); border-bottom-color: #d1d9e0; color: #1f2328; }
-  .topbar-title { font-size: 13px; color: #a3a09a; display: flex; align-items: center; gap: 10px; }
-  body[data-mode="light"] .topbar-title { color: #57606a; }
-  .topbar-title strong { color: inherit; }
-  .kbd-hint {
-    font-family: ui-monospace, SFMono-Regular, monospace;
+  @media (max-width: 860px) {
+    .workstation {
+      width: 100%;
+      padding: 12px;
+      margin: 20px auto 60px auto;
+    }
+    .card-row {
+      width: 100% !important;
+      overflow-x: auto;
+    }
+  }
+
+  .floating-hud {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .glass-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(13, 17, 23, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 107, 61, 0.35);
+    padding: 7px 15px;
+    border-radius: 999px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: rgba(255, 107, 61, 0.14);
-    color: #ff6b3d;
-    border: 1px solid rgba(255, 107, 61, 0.3);
-  }
-  .pills { display: flex; gap: 6px; align-items: center; }
-  .pill {
-    background: rgba(255,255,255,0.05); color: inherit; border: 1px solid rgba(150,150,150,0.25);
-    padding: 6px 14px; border-radius: 999px; font-size: 12px;
-    font-family: ui-monospace, SFMono-Regular, monospace; cursor: pointer;
-    transition: transform 140ms ease-out, background 140ms ease;
+    letter-spacing: 0.05em;
+    color: #f3f1ec;
+    cursor: pointer;
     text-decoration: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 10px rgba(255, 107, 61, 0.12);
+    transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    user-select: none;
   }
-  .pill:active { transform: scale(0.97); }
-  .pill.active { background: #ff6b3d; color: #fff; border-color: #ff6b3d; box-shadow: 0 0 18px rgba(255,107,61,0.38); }
-  .audio-pill { display: inline-flex; align-items: center; gap: 6px; border-color: rgba(255, 107, 61, 0.45); }
-  .audio-dot { width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
-  .audio-pill.armed .audio-dot { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
-  .audio-pill.muted .audio-dot { background: #736f68; box-shadow: none; }
-  .stage-wrap { display: flex; justify-content: center; gap: 24px; padding: 28px 16px 80px; flex-wrap: wrap; }
-  .col-box { width: 874px; padding: 24px; border-radius: 8px; border: 1px solid; }
-  .col-dark { background: #0d1117; border-color: #30363d; }
-  .col-light { background: #ffffff; border-color: #d1d9e0; display: none; }
+  .glass-pill:hover {
+    transform: translateY(-1px);
+    border-color: #ff6b3d;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55), 0 0 16px rgba(255, 107, 61, 0.35);
+  }
+  .glass-pill:active { transform: scale(0.97); }
+  .audio-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 8px #22c55e;
+    transition: background 180ms ease, box-shadow 180ms ease;
+  }
+  .glass-pill.muted .audio-dot {
+    background: #736f68;
+    box-shadow: none;
+  }
+  .glass-pill.muted {
+    opacity: 0.65;
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: none;
+  }
+  .sound-wave {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 10px;
+  }
+  .sound-wave span {
+    width: 2px;
+    height: 100%;
+    background: #ff6b3d;
+    border-radius: 1px;
+    animation: eq-wave 1.1s ease-in-out infinite alternate;
+  }
+  .sound-wave span:nth-child(2) { animation-delay: 0.22s; height: 60%; }
+  .sound-wave span:nth-child(3) { animation-delay: 0.45s; height: 80%; }
+  .glass-pill.muted .sound-wave span {
+    animation: none;
+    height: 2px;
+    background: #736f68;
+  }
+  @keyframes eq-wave {
+    0% { height: 25%; }
+    100% { height: 100%; }
+  }
+
   .card-row { display: flex; flex-wrap: wrap; width: 824px; margin: 0 auto; }
-  .static-card { position: relative; display: block; }
+  .static-card {
+    position: relative;
+    display: block;
+    transform: none !important;
+    transition: none !important;
+  }
+  .static-card:hover {
+    transform: none !important;
+  }
   .static-card svg { display: block; overflow: visible; }
-  .cal-cell.is-neighbor { transform: translateY(-1.8px) scale(1.08); filter: drop-shadow(0 0 5px rgba(255, 107, 61, 0.4)); }
-  .lang-seg.is-dimmed, .lang-row.is-dimmed { opacity: 0.35; }
-  .lang-row.is-hovered tspan { fill: #ff6b3d !important; }
-  .kw.is-linked {
+
+  /* Keywords hover & glowing effect */
+  .kw {
+    cursor: pointer;
+    transition: fill 140ms ease-out, filter 140ms ease-out;
+  }
+  .kw:hover, .kw.is-linked {
     fill: #ff6b3d !important;
-    filter: drop-shadow(0 0 9px rgba(255, 107, 61, 0.9)) drop-shadow(0 0 16px rgba(255, 107, 61, 0.5)) !important;
+    filter: drop-shadow(0 0 8px rgba(255, 107, 61, 0.9)) drop-shadow(0 0 16px rgba(255, 107, 61, 0.5)) !important;
+  }
+  .kw-giant, .stop {
+    cursor: pointer;
+    transition: filter 160ms ease-out;
+  }
+  .kw-giant:hover, .stop:hover {
+    filter: drop-shadow(0 0 16px rgba(255, 107, 61, 0.95)) !important;
+  }
+
+  /* 3D Calendar Cells in Plate 01 */
+  .cal-cell {
+    cursor: pointer;
+    transition: transform 160ms cubic-bezier(.23, 1, .32, 1), filter 160ms ease;
+    transform-box: fill-box;
+    transform-origin: center bottom;
+  }
+  .cal-cell:hover, .cal-cell.is-hovered {
+    transform: translateY(-4.5px) scale(1.28);
+    filter: drop-shadow(0 0 10px rgba(255, 107, 61, 0.95));
+  }
+  .cal-cell:hover .cal-top, .cal-cell.is-hovered .cal-top {
+    fill: #ff6b3d !important;
+  }
+  .cal-cell.is-neighbor {
+    transform: translateY(-1.8px) scale(1.08);
+    filter: drop-shadow(0 0 5px rgba(255, 107, 61, 0.45));
+  }
+
+  /* 24-Hour Rhythm Dial in Plate 02 */
+  .dial-wedge {
+    cursor: pointer;
+    transition: transform 180ms cubic-bezier(.23, 1, .32, 1), filter 180ms ease;
+    transform-box: fill-box;
+    transform-origin: 124px 192px;
+  }
+  .dial-wedge:hover, .dial-wedge.is-hovered {
+    transform: translateY(-2.8px) scale(1.06);
+    filter: drop-shadow(0 0 11px rgba(255, 107, 61, 0.9));
+  }
+  .dial-wedge:hover .wedge-top, .dial-wedge.is-hovered .wedge-top {
+    fill: #ff6b3d !important;
+  }
+  .dial-needle line {
+    transition: x2 140ms ease-out, y2 140ms ease-out;
+  }
+
+  /* Streak Spikes in Plate 03 */
+  .streak-spike {
+    cursor: pointer;
+    transition: transform 160ms cubic-bezier(.23, 1, .32, 1), filter 160ms ease;
+    transform-box: fill-box;
+    transform-origin: center bottom;
+  }
+  .streak-spike:hover, .streak-spike.is-hovered {
+    transform: scaleY(1.12) translateY(-2px);
+    filter: drop-shadow(0 0 10px rgba(255, 107, 61, 0.95));
+  }
+  .streak-spike:hover .spike-front, .streak-spike.is-hovered .spike-front {
+    fill: #ff6b3d !important;
+  }
+
+  /* Languages Segments & Rows in Plate 04 */
+  .lang-seg, .lang-row {
+    cursor: pointer;
+    transition: transform 180ms cubic-bezier(.23, 1, .32, 1), opacity 180ms ease, filter 180ms ease;
+  }
+  .lang-seg:hover, .lang-seg.is-hovered {
+    transform: translateY(-4px);
+    filter: drop-shadow(0 0 11px rgba(255, 107, 61, 0.9));
+  }
+  .lang-row:hover, .lang-row.is-hovered {
+    transform: translateX(4px);
+    filter: drop-shadow(0 0 8px rgba(255, 107, 61, 0.75));
+  }
+  .lang-row:hover tspan, .lang-row.is-hovered tspan {
+    fill: #ff6b3d !important;
+  }
+  .lang-seg.is-dimmed, .lang-row.is-dimmed {
+    opacity: 0.35;
+  }
+
+  /* Playable Mini-Piano in Lately */
+  .piano-key {
+    cursor: pointer;
+    transition: transform 100ms ease, filter 100ms ease;
+    transform-origin: center top;
+  }
+  .piano-key:hover, .piano-key.is-active {
+    filter: drop-shadow(0 0 11px rgba(255, 107, 61, 0.95)) !important;
+  }
+  .piano-key:active, .piano-key.is-active {
+    transform: translateY(2px) scaleY(0.97);
+  }
+  .piano-key.is-active .pk-top {
+    fill: #ff6b3d !important;
   }
 </style>
 </head>
 <body data-mode="dark">
-  <div class="topbar">
-    <div class="topbar-title">
-      <strong>${config.name.first} ${config.name.last} · Interactive Profile</strong>
-      <span>Hover keywords, tools &amp; 3D plates</span>
-      <span class="kbd-hint">🎹 Piano: Keys A–K / W–U</span>
-    </div>
-    <div class="pills">
-      <button id="audio-toggle" class="pill audio-pill" onclick="toggleAudio(event)">
-        <span class="audio-dot"></span>
-        <span id="audio-label">Audio: ON</span>
-      </button>
-      <button class="pill active" onclick="setMode('dark', this)">Dark (#0d1117)</button>
-      <button class="pill" onclick="setMode('light', this)">Light (#ffffff)</button>
-      <button class="pill" onclick="setMode('both', this)">Side by Side</button>
-      <a class="pill" href="https://github.com/${config.login}" target="_blank" rel="noopener">GitHub ↗</a>
-    </div>
+  <div class="floating-hud">
+    <button id="audio-toggle" class="glass-pill" onclick="toggleAudio(event)" title="Click to toggle micro-sounds">
+      <span class="audio-dot"></span>
+      <span id="audio-label">SOUND FX</span>
+      <span class="sound-wave"><span></span><span></span><span></span></span>
+    </button>
+    <a class="glass-pill" href="https://github.com/${config.login}" target="_blank" rel="noopener" title="View repository on GitHub">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="display:inline-block;vertical-align:text-bottom"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span>GitHub ↗</span>
+    </a>
   </div>
-  <div class="stage-wrap">
-    <div id="col-dark" class="col-box col-dark">${renderColumn('dark')}</div>
-    <div id="col-light" class="col-box col-light">${renderColumn('light')}</div>
-  </div>
+  <main class="workstation">
+    ${renderColumn('dark')}
+  </main>
   <script>
     // =========================================================================
     // 1. TACTILE WEB AUDIO SYNTHESIZER + ELECTRIC PIANO (Rhodes-style)
@@ -339,10 +495,13 @@ function buildInteractiveHtml(rendered) {
         const pill = document.getElementById('audio-toggle');
         const label = document.getElementById('audio-label');
         if (!pill || !label) return;
-        pill.classList.remove('armed', 'muted');
-        if (!enabled) { pill.classList.add('muted'); label.textContent = 'Audio: Muted'; }
-        else if (ctx && ctx.state === 'running') { pill.classList.add('armed'); label.textContent = 'Audio: ON'; }
-        else { label.textContent = 'Audio: Click to arm'; }
+        pill.classList.remove('muted');
+        if (!enabled) {
+          pill.classList.add('muted');
+          label.textContent = 'SOUND: OFF';
+        } else {
+          label.textContent = 'SOUND FX';
+        }
       }
 
       function canPlay(minGapMs = 22) {
@@ -479,14 +638,9 @@ function buildInteractiveHtml(rendered) {
       return { toggle() { enabled = !enabled; if (enabled) { ensureCtx(); playGiant(); } else updatePillUI(); }, playKeyword, playGiant, playCalendarCell, playDialTick, playStreak, playLanguage, playPianoNote };
     })();
 
-    function toggleAudio(e) { e.stopPropagation(); SoundFX.toggle(); }
-    function setMode(mode, btn) {
-      document.querySelectorAll('.pill:not(.audio-pill)').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.body.setAttribute('data-mode', mode === 'light' ? 'light' : 'dark');
-      document.getElementById('col-dark').style.display = mode === 'light' ? 'none' : 'block';
-      document.getElementById('col-light').style.display = mode === 'dark' ? 'none' : 'block';
-      SoundFX.playGiant();
+    function toggleAudio(e) {
+      if (e) e.stopPropagation();
+      SoundFX.toggle();
     }
 
     // =========================================================================
